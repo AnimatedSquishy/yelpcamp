@@ -1,6 +1,7 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+// if (process.env.NODE_ENV !== "production") {
+//   require("dotenv").config();
+// }
+require("dotenv").config();
 
 const express = require("express");
 const methodOverride = require("method-override");
@@ -11,6 +12,8 @@ const mongoose = require("mongoose");
 const path = require("path");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
+const expressMongoSanitize = require("@exortek/express-mongo-sanitize");
+const helmet = require("helmet");
 
 const ExpressError = require("./utils/ExpressError");
 const User = require("./models/users");
@@ -28,6 +31,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(expressMongoSanitize());
 
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
@@ -42,19 +46,84 @@ db.once("open", () => {
 });
 
 const sessionConfig = {
+  name: "__ui_s",
   secret: "secretcode",
   resave: false,
   saveUninitialized: true,
   cookie: {
+    // secure: true,
     httpOnly: true,
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
   },
 };
+
 app.use(session(sessionConfig));
+app.use(flash());
+
+const scriptSrcUrls = [
+  "https://stackpath.bootstrapcdn.com/",
+  "https://api.tiles.mapbox.com/",
+  "https://api.mapbox.com/",
+  "https://kit.fontawesome.com/",
+  "https://cdnjs.cloudflare.com/",
+  "https://cdn.jsdelivr.net",
+];
+
+const styleSrcUrls = [
+  "https://kit-free.fontawesome.com/",
+  "https://stackpath.bootstrapcdn.com/",
+  "https://api.mapbox.com/",
+  "https://api.tiles.mapbox.com/",
+  "https://fonts.googleapis.com/",
+  "https://use.fontawesome.com/",
+  "https://cdn.jsdelivr.net",
+];
+
+const connectSrcUrls = [
+  "'self'",
+  "https://api.mapbox.com/",
+  "https://events.mapbox.com/",
+  "https://*.tiles.mapbox.com/",
+  "https://cdn.jsdelivr.net",
+];
+
+const fontSrcUrls = [
+  "'self'",
+  "https://fonts.gstatic.com/",
+  "https://use.fontawesome.com/",
+  "https://cdn.jsdelivr.net",
+  "data:",
+];
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      objectSrc: ["'none'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
+      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+      connectSrc: connectSrcUrls,
+      imgSrc: [
+        "'self'",
+        "blob:",
+        "data:",
+        "https://res.cloudinary.com/dyq8h16eb/",
+        "https://images.unsplash.com/",
+        "https://images.pexels.com/",
+        "https://*.tiles.mapbox.com/",
+      ],
+      workerSrc: ["'self'", "blob:"],
+      fontSrc: fontSrcUrls,
+      upgradeInsecureRequests: [],
+    },
+  }),
+);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(flash());
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");

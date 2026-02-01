@@ -21,16 +21,12 @@ module.exports.createCampground = async (req, res, next) => {
     .send();
   const campground = new Campground(req.body.campground);
   campground.geometry = geoData.body.features[0].geometry;
+  console.log(req.files);
   campground.images = req.files.map((f) => ({
-    url: f.path,
-    filename: f.filename,
+    url: f.secure_url,
+    filename: f.public_id,
   }));
-  if (campground.images.length === 0) {
-    campground.images.push({
-      url: "https://res.cloudinary.com/dyq8h16eb/image/upload/w_300/v1750770265/YelpCamp/zunk12rpvmjer5jsbyiu.jpg",
-      filename: "YelpCamp/zunk12rpvmjer5jsbyiu",
-    });
-  }
+
   campground.author = req.user._id;
   await campground.save();
 
