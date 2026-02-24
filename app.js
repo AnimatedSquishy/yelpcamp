@@ -36,8 +36,10 @@ app.use(expressMongoSanitize());
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
+const dbUrl = process.env.DB_URL;
 
-const dbUrl = "mongodb://localhost:27017/yelp-camp";
+// const dbUrl =
+//   "mongodb+srv://User_1:LimbusCompanyBranch@yelpcluster.mmausgk.mongodb.net/?appName=yelpCluster";
 // const dbUrl = "mongodb://localhost:27017/yelp-camp";
 mongoose.connect(dbUrl);
 
@@ -60,7 +62,7 @@ store.on("error", function (e) {
 });
 
 const sessionConfig = {
-  store,
+  store: store,
   name: "__ui_s",
   secret: "secretcode",
   resave: false,
@@ -171,6 +173,10 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { err });
 });
 
-app.listen(3030, () => {
-  console.log("Server is running on port 3030");
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(3030, () => {
+    console.log("Server is running on port 3030");
+  });
+}
+
+module.exports = app;
