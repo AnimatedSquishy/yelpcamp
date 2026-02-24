@@ -37,10 +37,9 @@ const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 const dbUrl = process.env.DB_URL;
-
-// const dbUrl =
-//   "mongodb+srv://User_1:LimbusCompanyBranch@yelpcluster.mmausgk.mongodb.net/?appName=yelpCluster";
-// const dbUrl = "mongodb://localhost:27017/yelp-camp";
+if (!dbUrl) {
+  throw new Error("DB_URL is not set in Vercel Environment Variables");
+}
 mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
