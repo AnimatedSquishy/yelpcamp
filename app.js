@@ -40,6 +40,7 @@ const dbUrl = process.env.DB_URL;
 if (!dbUrl) {
   throw new Error("DB_URL is not set in Vercel Environment Variables");
 }
+
 mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
@@ -153,6 +154,10 @@ app.get("/fakeuser", async (req, res) => {
   const newUser = await User.register(user, "chicken123");
   res.send(newUser);
 });
+
+app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds/:id/reviews/", reviewRoutes);
+app.use("/", userRoutes);
 
 app.get("/", (req, res) => {
   res.render("home");
