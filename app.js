@@ -86,6 +86,7 @@ const scriptSrcUrls = [
   "https://cdnjs.cloudflare.com/",
   "https://cdn.jsdelivr.net",
   "https://va.vercel-scripts.com/",
+  "https://*.vercel-scripts.com/",
 ];
 
 const styleSrcUrls = [
@@ -105,6 +106,7 @@ const connectSrcUrls = [
   "https://*.tiles.mapbox.com/",
   "https://cdn.jsdelivr.net",
   "https://va.vercel-scripts.com/",
+  "https://*.vercel-scripts.com/",
 ];
 
 const fontSrcUrls = [
