@@ -3,17 +3,7 @@
   "builds": [
     {
       "src": "app.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "views/**",
-          "public/**",
-          "node_modules/mongodb/lib/**",
-          "node_modules/multer/**",
-          "node_modules/concat-stream/**",
-          "node_modules/readable-stream/**"
-        ]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [

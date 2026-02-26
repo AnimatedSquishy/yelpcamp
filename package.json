@@ -2,6 +2,7 @@
   "dependencies": {
     "@exortek/express-mongo-sanitize": "^1.1.1",
     "@mapbox/mapbox-sdk": "^0.16.1",
+    "@vercel/analytics": "^1.6.1",
     "aws4": "^1.13.2",
     "bs-custom-file-input": "^1.3.4",
     "cloudinary": "^2.9.0",
