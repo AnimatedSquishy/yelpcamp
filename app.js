@@ -36,7 +36,7 @@ app.use(expressMongoSanitize());
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
-const dbUrl = process.env.DB_URL;
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
 if (!dbUrl) {
   throw new Error("DB_URL is not set in Vercel Environment Variables");
 }
@@ -48,12 +48,13 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
   console.log("Database connected");
 });
+const secret = process.env.SECRET || "thisshouldbeabettersecret!";
 
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   touchAfter: 24 * 60 * 60,
   crypto: {
-    secret: "secretcode",
+    secret,
   },
 });
 
@@ -64,7 +65,7 @@ store.on("error", function (e) {
 const sessionConfig = {
   store: store,
   name: "__ui_s",
-  secret: "secretcode",
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -176,10 +177,11 @@ app.use((err, req, res, next) => {
   if (!err.message) err.message = "Oh No, Something Went Wrong!";
   res.status(statusCode).render("error", { err });
 });
+const port = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV !== "production") {
-  app.listen(3030, () => {
-    console.log("Server is running on port 3030");
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
   });
 }
 
